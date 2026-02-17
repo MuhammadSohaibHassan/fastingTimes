@@ -113,20 +113,26 @@ document.getElementById('downloadPdf').addEventListener('click', () => {
     const longitude = document.getElementById('longitude').value;
     const angle = document.getElementById('angle').value;
     
+    // Calculate number of days
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    
     // Create a clean version for PDF
     const element = document.createElement('div');
-    element.style.padding = '20px';
+    element.style.padding = '10px';
     element.style.background = '#fff';
     element.style.color = '#000';
+    element.style.width = '100%';
+    element.style.boxSizing = 'border-box';
     
     // Add header
     element.innerHTML = `
-        <div style="text-align: center; margin-bottom: 15px;">
-            <h1 style="font-size: 20px; margin-bottom: 8px; padding-bottom: 8px;">Ramadan Fasting Times</h1>
-            <p style="font-size: 11px; color: #666; margin-bottom: 3px;">Suhoor (Fajr) and Iftar (Sunset) Times</p>
-            <p style="font-size: 10px; color: #666;">
-                ${formatDate(startDate)} to ${formatDate(endDate)}<br>
-                Location: ${latitude}°, ${longitude}° | Fajr Angle: ${angle}°
+        <div style="text-align: center; margin-bottom: 10px;">
+            <h1 style="font-size: 18px; margin: 0 0 6px 0; font-weight: 600;">Ramadan Fasting Times</h1>
+            <p style="font-size: 10px; color: #666; margin: 0 0 3px 0;">Suhoor (Fajr) and Iftar (Sunset) Times</p>
+            <p style="font-size: 9px; color: #666; margin: 0;">
+                ${formatDate(startDate)} to ${formatDate(endDate)} (${daysDiff} days) | Location: ${latitude}°, ${longitude}° | Fajr Angle: ${angle}°
             </p>
         </div>
     `;
@@ -134,18 +140,72 @@ document.getElementById('downloadPdf').addEventListener('click', () => {
     // Clone and append the table
     const tableContainer = document.getElementById('tableContainer').cloneNode(true);
     tableContainer.classList.remove('hidden');
+    
+    // Style the table for PDF
+    const table = tableContainer.querySelector('table');
+    if (table) {
+        table.style.width = '100%';
+        table.style.fontSize = '8px';
+        table.style.borderCollapse = 'collapse';
+        
+        // Style all cells
+        const cells = table.querySelectorAll('th, td');
+        cells.forEach(cell => {
+            cell.style.padding = '4px 2px';
+            cell.style.border = '1px solid #000';
+            cell.style.textAlign = 'center';
+        });
+        
+        // Style header
+        const headers = table.querySelectorAll('th');
+        headers.forEach(th => {
+            th.style.background = '#000';
+            th.style.color = '#fff';
+            th.style.fontSize = '8px';
+        });
+        
+        // Add page break class to rows for better pagination
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach((row, index) => {
+            row.style.pageBreakInside = 'avoid';
+        });
+    }
+    
     element.appendChild(tableContainer);
     
-    // PDF options
+    // Determine orientation based on number of days
+    // Use landscape for large datasets to fit more columns comfortably
+    const orientation = daysDiff > 60 ? 'landscape' : 'portrait';
+    
+    // PDF options - handles any number of rows with automatic pagination
     const opt = {
-        margin: 10,
+        margin: [8, 8, 8, 8],
         filename: `ramadan-fasting-times-${startDate}-to-${endDate}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        image: { 
+            type: 'jpeg', 
+            quality: 0.95 
+        },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            windowWidth: 1200
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: orientation,
+            compress: true
+        },
+        pagebreak: { 
+            mode: ['avoid-all', 'css', 'legacy'],
+            before: '.page-break-before',
+            after: '.page-break-after',
+            avoid: 'tr'
+        }
     };
     
-    // Generate PDF
+    // Generate PDF with automatic page handling
     html2pdf().set(opt).from(element).save();
 });
 
