@@ -96,25 +96,11 @@ document.getElementById('calculate').addEventListener('click', async () => {
         // Display table
         displayTable(tableData);
         hideLoading();
-        
-        // Show print button
-        const printBtn = document.getElementById('printBtn');
-        if (printBtn) {
-            printBtn.classList.remove('hidden');
-        }
     } catch (error) {
         hideLoading();
         showError(error.message || 'Failed to calculate times');
     }
 });
-
-// Print button handler
-const printBtn = document.getElementById('printBtn');
-if (printBtn) {
-    printBtn.addEventListener('click', () => {
-        window.print();
-    });
-}
 
 // Calculate twilight and sunset times for a single day
 function calculateDayTimes(dateStr, observer, angle) {
@@ -297,15 +283,7 @@ function hideError() {
 }
 
 function hideTable() {
-    const tableContainer = document.getElementById('tableContainer');
-    const printBtn = document.getElementById('printBtn');
-    
-    if (tableContainer) {
-        tableContainer.classList.add('hidden');
-    }
-    if (printBtn) {
-        printBtn.classList.add('hidden');
-    }
+    document.getElementById('tableContainer').classList.add('hidden');
 }
 
 // Toggle info section
