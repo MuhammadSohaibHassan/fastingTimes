@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramadan Fasting Times Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header-section">
+            <h1>Ramadan Fasting Times Calculator</h1>
+            <p class="subtitle">Precise Suhoor (Fajr) and Iftar (Sunset) Times with Millisecond Accuracy</p>
+            <p class="description">Calculate exact fasting start and end times for Ramadan using astronomical calculations based on your location</p>
+            <button id="infoToggle" class="info-toggle-small" title="About this calculator">i</button>
+        </div>
+        
+        <!-- Collapsible Info Section -->
+        <div id="infoSection" class="info-section collapsed">
+            <div class="info-content">
+                <h3>Astronomy Library</h3>
+                <p>This calculator uses the <strong>Astronomy Engine</strong> library by Don Cross for high-precision astronomical calculations.</p>
+                
+                <h3>Calculation Methods</h3>
+                <p><strong>Astronomy.SearchAltitude()</strong> - Finds the exact time when the sun reaches a specified altitude angle below the horizon with millisecond precision.</p>
+                
+                <p><strong>Astronomy.SearchRiseSet()</strong> - Calculates exact sunset times for breaking the fast.</p>
+                
+                <h3>Fajr Twilight Angles</h3>
+                <ul>
+                    <li><strong>-18°</strong> - Astronomical twilight (Muslim World League standard)</li>
+                    <li><strong>-15°</strong> - ISNA method (North America)</li>
+                    <li><strong>-19.5°</strong> - Egyptian General Authority</li>
+                </ul>
+                
+                <h3>Rounding Rules for Fasting Safety</h3>
+                <p><strong>Suhoor/Fajr Time:</strong> Rounded DOWN to the previous minute - ensures you stop eating before the actual time (precautionary measure)</p>
+                <p><strong>Iftar/Sunset Time:</strong> Rounded UP to the next minute - ensures you break fast after the sun has truly set (precautionary measure)</p>
+                <p>These safety margins align with the Islamic practice of "Imsak" (precautionary buffer time).</p>
+                
+                <h3>Library Information</h3>
+                <p><strong>Source:</strong> <a href="https://github.com/cosinekitty/astronomy" target="_blank">github.com/cosinekitty/astronomy</a></p>
+                <p><strong>License:</strong> MIT License | <strong>Author:</strong> Don Cross</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" value="2026-02-19" />
+                </div>
+                
+                <div class="input-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" value="2026-03-20" />
+                </div>
+            </div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="latitude">Latitude</label>
+                    <input type="number" id="latitude" step="0.00000001" value="32.13812671" />
+                </div>
+                
+                <div class="input-group">
+                    <label for="longitude">Longitude</label>
+                    <input type="number" id="longitude" step="0.00000001" value="71.46861919" />
+                </div>
+            </div>
+            
+            <button id="fetchGps" class="btn btn-gps">Get My GPS Location</button>
+            <p class="gps-note">Note: If GPS accuracy is low (>1km), go outdoors and try again. If still inaccurate, manually enter coordinates from Google Maps or Google Earth.</p>
+            
+            <div class="input-group">
+                <label for="angle">Fajr Angle (degrees)</label>
+                <input type="number" id="angle" step="0.01" value="-18" />
+                <small class="hint">Standard: -18° (Muslim World League), -15° (ISNA), -19.5° (Egypt)</small>
+            </div>
+            
+            <button id="calculate" class="btn">Generate Table</button>
+            <button id="downloadPdf" class="btn btn-secondary hidden">Download as PDF</button>
+            
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p id="loadingText">Calculating...</p>
+            </div>
+            
+            <div id="error" class="error hidden"></div>
+            
+            <div id="tableContainer" class="table-container hidden">
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Date</th>
+                            <th>Actual Fajr<br><span class="angle-label" id="twilightAngleLabel">(-18°)</span></th>
+                            <th>Actual Sunset</th>
+                            <th>Suhoor Time<br><span class="angle-label">(Rounded)</span></th>
+                            <th>Iftar Time<br><span class="angle-label">(Rounded)</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script src="astronomy.browser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
