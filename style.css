@@ -222,13 +222,13 @@ input[type="number"]:focus {
     transform: scale(0.98);
 }
 
-.btn-secondary {
+.btn-print {
     background: #fff;
     color: #000;
     border: 2px solid #000;
 }
 
-.btn-secondary:hover {
+.btn-print:hover {
     background: #000;
     color: #fff;
 }
@@ -381,36 +381,52 @@ tbody tr:nth-child(even) .rounded-cell {
     display: none;
 }
 
-/* Print styles for PDF */
+/* Print styles */
 @media print {
     body {
         padding: 0;
         background: #fff;
     }
     
-    .card {
-        padding: 0;
+    .header-section {
+        margin-bottom: 1rem;
     }
     
-    .btn, .info-btn, .header-row button, .input-group, .input-row, label, small {
+    .info-toggle-small,
+    .card,
+    .btn,
+    .info-section,
+    .input-group,
+    .input-row,
+    .gps-note,
+    label,
+    small {
         display: none !important;
-    }
-    
-    .table-container {
-        margin-top: 0;
     }
     
     h1 {
         font-size: 1.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
     
     .subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .description {
+        font-size: 0.85rem;
         margin-bottom: 1rem;
+    }
+    
+    .table-container {
+        margin-top: 0;
+        overflow: visible;
     }
     
     table {
         page-break-inside: auto;
+        font-size: 9px;
     }
     
     tr {
@@ -420,6 +436,10 @@ tbody tr:nth-child(even) .rounded-cell {
     
     thead {
         display: table-header-group;
+    }
+    
+    th, td {
+        padding: 4px 2px;
     }
 }
 
