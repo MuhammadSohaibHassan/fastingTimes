@@ -222,17 +222,6 @@ input[type="number"]:focus {
     transform: scale(0.98);
 }
 
-.btn-print {
-    background: #fff;
-    color: #000;
-    border: 2px solid #000;
-}
-
-.btn-print:hover {
-    background: #000;
-    color: #fff;
-}
-
 .btn-gps {
     background: #fff;
     color: #000;
@@ -388,45 +377,29 @@ tbody tr:nth-child(even) .rounded-cell {
         background: #fff;
     }
     
-    .header-section {
-        margin-bottom: 1rem;
+    .card {
+        padding: 0;
     }
     
-    .info-toggle-small,
-    .card,
-    .btn,
-    .info-section,
-    .input-group,
-    .input-row,
-    .gps-note,
-    label,
-    small {
+    .btn, .info-btn, .header-row button, .input-group, .input-row, label, small {
         display: none !important;
-    }
-    
-    h1 {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 0.25rem;
-    }
-    
-    .description {
-        font-size: 0.85rem;
-        margin-bottom: 1rem;
     }
     
     .table-container {
         margin-top: 0;
-        overflow: visible;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .subtitle {
+        margin-bottom: 1rem;
     }
     
     table {
         page-break-inside: auto;
-        font-size: 9px;
     }
     
     tr {
@@ -436,10 +409,6 @@ tbody tr:nth-child(even) .rounded-cell {
     
     thead {
         display: table-header-group;
-    }
-    
-    th, td {
-        padding: 4px 2px;
     }
 }
 
