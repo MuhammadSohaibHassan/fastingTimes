@@ -78,6 +78,20 @@
                 <small class="hint">Standard: -18° (Muslim World League), -15° (ISNA), -19.5° (Egypt)</small>
             </div>
             
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="suhoorMargin">Suhoor Safety Buffer (seconds)</label>
+                    <input type="number" id="suhoorMargin" step="1" value="90" min="0" max="300" />
+                    <small class="hint">Subtracted from actual time, then rounded down (floor)</small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="iftarMargin">Iftar Safety Buffer (seconds)</label>
+                    <input type="number" id="iftarMargin" step="1" value="90" min="0" max="300" />
+                    <small class="hint">Added to actual time, then rounded up (ceiling)</small>
+                </div>
+            </div>
+            
             <button id="calculate" class="btn">Generate Table</button>
             
             <div id="loading" class="loading hidden">
