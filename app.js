@@ -5,6 +5,8 @@ document.getElementById('calculate').addEventListener('click', async () => {
     const latitudeInput = document.getElementById('latitude').value;
     const longitudeInput = document.getElementById('longitude').value;
     const angleInput = document.getElementById('angle').value;
+    const suhoorMarginInput = document.getElementById('suhoorMargin').value;
+    const iftarMarginInput = document.getElementById('iftarMargin').value;
     
     // Validation
     if (!startDateInput || !endDateInput) {
@@ -18,13 +20,15 @@ document.getElementById('calculate').addEventListener('click', async () => {
     }
     
     if (!angleInput) {
-        showError('Please enter the twilight angle');
+        showError('Please enter the Fajr angle');
         return;
     }
     
     const latitude = parseFloat(latitudeInput);
     const longitude = parseFloat(longitudeInput);
     const angle = parseFloat(angleInput);
+    const suhoorMargin = parseInt(suhoorMarginInput) || 90;
+    const iftarMargin = parseInt(iftarMarginInput) || 90;
     
     // Validate coordinate ranges
     if (isNaN(latitude) || latitude < -90 || latitude > 90) {
@@ -39,6 +43,16 @@ document.getElementById('calculate').addEventListener('click', async () => {
     
     if (isNaN(angle)) {
         showError('Please enter a valid angle');
+        return;
+    }
+    
+    if (suhoorMargin < 0 || suhoorMargin > 300) {
+        showError('Suhoor buffer must be between 0 and 300 seconds');
+        return;
+    }
+    
+    if (iftarMargin < 0 || iftarMargin > 300) {
+        showError('Iftar buffer must be between 0 and 300 seconds');
         return;
     }
     
@@ -93,8 +107,8 @@ document.getElementById('calculate').addEventListener('click', async () => {
             }
         }
         
-        // Display table
-        displayTable(tableData);
+        // Display table with safety margins
+        displayTable(tableData, suhoorMargin, iftarMargin);
         hideLoading();
     } catch (error) {
         hideLoading();
@@ -149,35 +163,44 @@ function formatTimeWithMilliseconds(date) {
     return `${hours}:${minutes}:${seconds}.${milliseconds}`;
 }
 
-// Round twilight time DOWN (floor) - for Fajr safety
-function roundTwilightDown(date) {
-    const rounded = new Date(date);
-    rounded.setSeconds(0);
-    rounded.setMilliseconds(0);
-    return rounded;
+// Round twilight time for Suhoor: subtract seconds, then floor to previous minute
+function roundTwilightDown(date, bufferSeconds = 90) {
+    const adjusted = new Date(date);
+    
+    // Subtract buffer seconds from actual time
+    adjusted.setSeconds(adjusted.getSeconds() - bufferSeconds);
+    
+    // Floor to previous minute (remove seconds and milliseconds)
+    adjusted.setSeconds(0);
+    adjusted.setMilliseconds(0);
+    
+    return adjusted;
 }
 
-// Round sunset time UP (ceiling) - for Iftar safety
-function roundSunsetUp(date) {
-    const rounded = new Date(date);
+// Round sunset time for Iftar: add seconds, then ceiling to next minute
+function roundSunsetUp(date, bufferSeconds = 90) {
+    const adjusted = new Date(date);
     
-    // If there are any seconds or milliseconds, round up to next minute
-    if (date.getSeconds() > 0 || date.getMilliseconds() > 0) {
-        rounded.setMinutes(date.getMinutes() + 1);
+    // Add buffer seconds to actual time
+    adjusted.setSeconds(adjusted.getSeconds() + bufferSeconds);
+    
+    // Ceiling to next minute (if there are any seconds/milliseconds, round up)
+    if (adjusted.getSeconds() > 0 || adjusted.getMilliseconds() > 0) {
+        adjusted.setMinutes(adjusted.getMinutes() + 1);
     }
     
-    rounded.setSeconds(0);
-    rounded.setMilliseconds(0);
-    return rounded;
+    adjusted.setSeconds(0);
+    adjusted.setMilliseconds(0);
+    
+    return adjusted;
 }
 
-// Format rounded time (HH:MM:SS)
+// Format rounded time (HH:MM) - without seconds
 function formatRoundedTime(date) {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
     
-    return `${hours}:${minutes}:${seconds}`;
+    return `${hours}:${minutes}`;
 }
 
 // Format date for display
@@ -188,7 +211,7 @@ function formatDate(dateStr) {
 }
 
 // Display table
-function displayTable(tableData) {
+function displayTable(tableData, suhoorBuffer = 90, iftarBuffer = 90) {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
     
@@ -228,11 +251,11 @@ function displayTable(tableData) {
         }
         tr.appendChild(actualSunsetCell);
         
-        // Rounded Twilight time column (rounded DOWN)
+        // Rounded Twilight time column (subtract buffer, then floor)
         const roundedTwilightCell = document.createElement('td');
         roundedTwilightCell.className = 'time-cell rounded-cell';
         if (row.twilight) {
-            const roundedTwilight = roundTwilightDown(row.twilight);
+            const roundedTwilight = roundTwilightDown(row.twilight, suhoorBuffer);
             roundedTwilightCell.textContent = formatRoundedTime(roundedTwilight);
         } else {
             roundedTwilightCell.textContent = 'N/A';
@@ -240,11 +263,11 @@ function displayTable(tableData) {
         }
         tr.appendChild(roundedTwilightCell);
         
-        // Rounded Sunset time column (rounded UP)
+        // Rounded Sunset time column (add buffer, then ceiling)
         const roundedSunsetCell = document.createElement('td');
         roundedSunsetCell.className = 'time-cell rounded-cell';
         if (row.sunset) {
-            const roundedSunset = roundSunsetUp(row.sunset);
+            const roundedSunset = roundSunsetUp(row.sunset, iftarBuffer);
             roundedSunsetCell.textContent = formatRoundedTime(roundedSunset);
         } else {
             roundedSunsetCell.textContent = 'N/A';
